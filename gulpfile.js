@@ -12,5 +12,8 @@ var elixir = require('laravel-elixir');
  */
 
 elixir(function(mix) {
-    mix.sass('app.scss');
+    mix.sass('app.scss');//create app.css
+    mix.stylesIn('public/css');//combine to all.css
+    mix.scripts('*.*');//combine to all.js
+    mix.version(['public/css/all.css','public/js/all.js']);
 });
