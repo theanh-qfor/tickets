@@ -12,7 +12,7 @@
     <link href="{{ url('build/css/bootstrap.min.css') }}" rel="stylesheet">
     @stack('styles')
     <!-- All custom css -->
-    <link href="{{ elixir('css/all.css') }}" rel="stylesheet">
+    <link href="{{ url(elixir('css/all.css')) }}" rel="stylesheet">
 </head>
 
 <body>
@@ -72,6 +72,6 @@
 <script src="{{url('build/js/backbone-min.js')}}" type="text/javascript"></script>
 <script src="{{url('build/js/bootstrap.min.js')}}"></script>
 @stack('scripts')
-<script src="{{elixir('js/all.js')}}"></script>
+<script src="{{url(elixir('js/all.js'))}}"></script>
 </body>
 </html>
