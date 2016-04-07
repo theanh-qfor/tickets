@@ -21,3 +21,8 @@ Route::get('register', 'Auth\AuthController@getRegister');
 Route::post('register', 'Auth\AuthController@postRegister');
 
 Route::auth();
+
+Route::get('/index', function(){
+    return view("index");
+});
+Route::post('/processform', 'IndexController@addTicket');
