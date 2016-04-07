@@ -3,7 +3,7 @@
     Login
     @endsection
 @section('content')
-    <form class="form-signin" method="POST" action="/login">
+    <form class="form-signin" method="POST" action="{{url('/login')}}">
         {!! csrf_field() !!}
         @if (count($errors) > 0)
             <div class="alert alert-danger">

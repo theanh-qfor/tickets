@@ -22,6 +22,7 @@ Route::post('register', 'Auth\AuthController@postRegister');
 
 Route::auth();
 
+Route::get('tickets','TicketsController@getTickets');
 Route::get('/index', function(){
     return view("index");
 });
