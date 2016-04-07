@@ -26,4 +26,4 @@ Route::get('tickets','TicketsController@getTickets');
 Route::get('/index', function(){
     return view("index");
 });
-Route::post('/processform', 'IndexController@addTicket');
+Route::post('/add_tickets', 'TicketsController@addTicket');

@@ -36,7 +36,7 @@
             </div>
         </div>
     </div>
-    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button>
+    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Add Ticket</button>
 
     <div id="myModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
@@ -44,7 +44,7 @@
                 {!! Form::open(['url' => '/add_tickets', 'class' => 'form-horizontal']) !!}
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Modal Header</h4>
+                    <h4 class="modal-title">Add Ticket</h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -54,7 +54,7 @@
                         </div>
                         {!! Form::label('date-label', 'Date:', ['class' => 'col-lg-2 control-label']) !!}
                         <div class="col-lg-4">
-                            {!! Form::text('date', $value = null, ['class' => 'form-control', 'disabled']) !!}
+                            {!! Form::text('date', $value = date('m/d/Y'), ['class' => 'form-control', 'disabled']) !!}
                         </div>
                     </div>
 
