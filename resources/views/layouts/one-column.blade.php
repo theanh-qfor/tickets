@@ -12,7 +12,7 @@
     <link href="{{ url('build/css/bootstrap.min.css') }}" rel="stylesheet">
     @stack('styles')
     <!-- All custom css -->
-    <link href="{{ elixir('css/all.css') }}" rel="stylesheet">
+    <link href="{{ url(elixir('css/all.css')) }}" rel="stylesheet">
 </head>
 
 <body>
@@ -30,7 +30,7 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="/">Home</a></li>
+                <li class="active"><a href="{{url('/')}}">Home</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <!-- Authentication Links -->
@@ -72,6 +72,6 @@
 <script src="{{url('build/js/backbone-min.js')}}" type="text/javascript"></script>
 <script src="{{url('build/js/bootstrap.min.js')}}"></script>
 @stack('scripts')
-<script src="{{elixir('js/all.js')}}"></script>
+<script src="{{url(elixir('js/all.js'))}}"></script>
 </body>
 </html>
