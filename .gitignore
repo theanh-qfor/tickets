@@ -1,3 +1,6 @@
+/public/build/rev-manifest.json
+/public/build/css/all.css.map
+/public/build/js/all.js.map
 /.idea
 /vendor
 /node_modules
@@ -5,3 +8,9 @@
 Homestead.yaml
 Homestead.json
 .env
+/public/js/all.js.map
+/public/js/all.js
+/public/css/all.css.map
+/public/css/app.css
+/public/css/all.css
+/public/css/app.css.map
