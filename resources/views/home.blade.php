@@ -1,9 +1,9 @@
 @extends('layouts.one-column')
 @push('scripts')
-<script src="/build/dist/bootstrap-table.min.js"></script>
+<script src="{{url('/build/dist/bootstrap-table.min.js')}}"></script>
 @endpush
 @push('styles')
-<link rel="stylesheet" href="/build/dist/bootstrap-table.min.css"/>
+<link rel="stylesheet" href="{{url('/build/dist/bootstrap-table.min.css')}}"/>
 @endpush
 @section('content')
 <div class="container">
