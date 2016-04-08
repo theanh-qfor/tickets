@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\Models\TicketModel;
+use App\Models\TicketFilesModel;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Input, Redirect;
@@ -38,7 +39,33 @@ class TicketsController extends Controller
         $ticket->importance = Input::get('importance');
         $ticket->status = Input::get('status');
         $ticket->save();
+
+        $file_ids = Input::get("qty");
+        foreach ($file_ids as $key => $value) {
+            $file_object = TicketFilesModel::find($value);
+            $file_object->ticket_id = $ticket->id;
+            $file_object->save();
+        }
         return Redirect::back();
 
+    }
+    public function upload()
+    {
+        $file = Input::file('file');
+
+        if($file) {
+            $destinationPath = public_path().'/uploads/';
+            $filename = $file->getClientOriginalName().'.'.$file->getClientOriginalExtension();
+
+            $upload_success = $file->move($destinationPath, $filename);
+            $ticket_files = new TicketFilesModel();
+            $ticket_files->file_path = $destinationPath;
+            $ticket_files->file_name = $filename;
+            $ticket_files->save();
+        };
+        return response()->json(array(
+            'success' => true,
+            'id'   => $ticket_files->id
+        ));
     }
 }

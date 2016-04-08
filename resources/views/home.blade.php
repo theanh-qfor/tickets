@@ -82,9 +82,11 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        {!! Form::label('upload', 'Upload:', ['class' => 'col-lg-2 control-label']) !!}
-                        <div class="col-lg-6">
-                            {!! Form::file('file'); !!}
+                        <a class="col-lg-4" id="browse" href="javascript:;" data-href="{{url('/upload')}}">Upload Files</a>
+                        <br />
+                        <div>
+                            <ul id="filelist"></ul>
+                            <div class="file-array"></div>
                         </div>
                     </div>
                 </div>
