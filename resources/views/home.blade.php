@@ -30,7 +30,8 @@
                             <div class="row">
                                 <div class="col-xs-5">
                                     <select class="form-control" id="status-filter">
-                                        <option value="">Status...</option>
+                                        <option value="" disabled="disabled">Status...</option>
+                                        <option value="">All</option>
                                         @forelse($statuses as $status)
                                             <option {{$status}}>{{$status}}</option>
                                             @empty
@@ -39,7 +40,8 @@
                                 </div>
                                 <div class="col-xs-5">
                                     <select class="form-control" id="importance-filter">
-                                        <option value="">Importance...</option>
+                                        <option value="" disabled="disabled">Importance...</option>
+                                        <option value="">All</option>
                                         @forelse($importances as $importance)
                                             <option {{$importance}}>{{$importance}}</option>
                                             @empty
