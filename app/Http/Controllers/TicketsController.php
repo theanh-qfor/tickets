@@ -7,7 +7,7 @@ use App\Models\TicketModel;
 use App\Models\TicketFilesModel;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Input, Redirect;
+
 
 class TicketsController extends Controller
 {
@@ -52,7 +52,7 @@ class TicketsController extends Controller
             'total'=>$total,
             'rows'=>$items,
         ];
-        $this->createSampleTickets();
+        //$this->createSampleTickets();
         return response()->json($results);
     }
     function createSampleTickets($user_id=1,$num=100){
