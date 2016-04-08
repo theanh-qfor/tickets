@@ -10,4 +10,11 @@ class TicketModel extends Model
      * @var string
      */
     protected $table = 'tickets';
+    protected $fillable = array('subject','description','status','importance');
+    static $allStatus=array(
+        'new','under-review', 'assigned', 'question', 'answer', 'resolved', 'cancelled','closed'
+    );
+    static $allImportances=array(
+        'low', 'normal', 'high', 'urgent',
+    );
 }
