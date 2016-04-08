@@ -18,6 +18,8 @@ class CreateTicketsTable extends Migration
             $table->longText('description');
             $table->string('status',50);
             $table->string('importance',20);
+            $table->integer('user_id')->unsigned();
+            $table->integer('assigned_to')->unsigned();
             $table->timestamps();
         });
 
