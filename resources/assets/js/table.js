@@ -8,7 +8,15 @@ var listTicketTable = {};
     };
     table.initVars();
     table.filter=function(args){
-        table.vars.filters=args;
+        if(typeof args=='object'){
+            for(var key in args){
+                if(args.hasOwnProperty(key)){
+                    table.vars.filters[key]=args[key];
+                }
+            }
+        }else {
+            table.vars.filters ={};
+        }
     };
     table.init = function () {
         $table.bootstrapTable({
@@ -47,7 +55,7 @@ var listTicketTable = {};
                 },
                 {
                     title: 'Date',
-                    field: 'date',
+                    field: 'created_at',
                     sortable: true
                 },
                 {
@@ -97,8 +105,23 @@ var listTicketTable = {};
             selections = getIdSelections();
             // push or splice the selections if you want to save all data selections
         });
+        $status_filter=$('#status-filter');
+        $importance_filter=$('#importance-filter');
+        $status_filter.on('change',function(){
+            table.filter({'status':$(this).val()});
+            table.refresh();
+        });
+        $importance_filter.on('change',function(){
+            table.filter({'importance':$(this).val()})
+            table.refresh();
+        });
     };
-
-    table.init();
+    table.refresh=function(){
+        $table.bootstrapTable('refresh');
+    };
+    if($table.length==1) {
+        table.init();
+        table.setupToolbar();
+    }
 
 })(jQuery, listTicketTable);
