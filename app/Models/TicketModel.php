@@ -1,5 +1,6 @@
 <?php
 namespace App\Models;
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class TicketModel extends Model
@@ -17,4 +18,7 @@ class TicketModel extends Model
     static $allImportances=array(
         'low', 'normal', 'high', 'urgent',
     );
+    function user(){
+        $this->belongsTo(User::class);
+    }
 }
