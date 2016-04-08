@@ -27,6 +27,19 @@ class TicketsController extends Controller
             'total'=>$total,
             'rows'=>$all,
         ];
+        //$this->createSampleTickets();
         return response()->json($results);
+    }
+    function createSampleTickets($user_id=1,$num=100){
+        for($i=0;$i<$num;$i++) {
+            $data = array(
+                'subject' => 'Ticket  ' . rand(),
+                'description' => 'Ticket description ' . rand(),
+                'status' => TicketModel::$allStatus[array_rand(TicketModel::$allStatus)],
+                'importance' => TicketModel::$allStatus[array_rand(TicketModel::$allImportances)],
+                'assigned_to' => 0,
+            );
+            (new TicketModel($data))->save();
+        }
     }
 }
