@@ -29,7 +29,7 @@
                         <div type="text/template" class="container-fluid" id="toolbar">
                             <div class="row">
                                 <div class="col-xs-5">
-                                    <select class="form-control" id="status">
+                                    <select class="form-control" id="status-filter">
                                         <option value="">Status...</option>
                                         @forelse($statuses as $status)
                                             <option {{$status}}>{{$status}}</option>
@@ -38,8 +38,8 @@
                                     </select>
                                 </div>
                                 <div class="col-xs-5">
-                                    <select class="form-control" id="importance">
-                                        <option>Importance...</option>
+                                    <select class="form-control" id="importance-filter">
+                                        <option value="">Importance...</option>
                                         @forelse($importances as $importance)
                                             <option {{$importance}}>{{$importance}}</option>
                                             @empty

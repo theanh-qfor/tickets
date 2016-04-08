@@ -22,13 +22,37 @@ class TicketsController extends Controller
     }
 
     public function getTickets(Request $request){
-        $all=TicketModel::all();
-        $total=TicketModel::count();
+        $limit=$request->query('limit',10);
+        $offset=$request->query('offset',0);
+        $search=$request->query('search');
+        $sort=$request->query('sort');
+        $order=$request->query('order');
+        if(!$sort){
+            $sort='id';
+            $order='desc';
+        }
+        $tickets=TicketModel::orderBy($sort,$order);
+        if($status=$request->query('status')){
+            $tickets->where('status',$status);
+        }
+        if($importance=$request->query('importance')){
+            $tickets->where('importance',$importance);
+        }
+        if($search) {
+            $tickets->orwhere('subject','LIKE','%'.$search.'%');
+            $tickets->orwhere('description','LIKE','%'.$search.'%');
+            $tickets->orwhere('status','LIKE',$search.'%');
+            $tickets->orwhere('importance','LIKE',$search.'%');
+            $tickets->orwhere('created_at','LIKE','%'.$search.'%');
+        }
+
+        $items=$tickets->skip($offset)->take($limit)->get();
+        $total=$tickets->count();
         $results=[
             'total'=>$total,
-            'rows'=>$all,
+            'rows'=>$items,
         ];
-        //$this->createSampleTickets();
+        $this->createSampleTickets();
         return response()->json($results);
     }
     function createSampleTickets($user_id=1,$num=100){
@@ -37,7 +61,7 @@ class TicketsController extends Controller
                 'subject' => 'Ticket  ' . rand(),
                 'description' => 'Ticket description ' . rand(),
                 'status' => TicketModel::$allStatus[array_rand(TicketModel::$allStatus)],
-                'importance' => TicketModel::$allStatus[array_rand(TicketModel::$allImportances)],
+                'importance' => TicketModel::$allImportances[array_rand(TicketModel::$allImportances)],
                 'assigned_to' => 0,
             );
             (new TicketModel($data))->save();
