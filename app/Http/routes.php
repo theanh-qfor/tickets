@@ -23,3 +23,8 @@ Route::post('register', 'Auth\AuthController@postRegister');
 Route::auth();
 
 Route::get('tickets','TicketsController@getTickets');
+Route::get('/index', function(){
+    return view("index");
+});
+Route::post('/add_tickets', 'TicketsController@addTicket');
+Route::post('/upload', 'TicketsController@upload');
