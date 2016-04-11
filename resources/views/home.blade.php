@@ -73,11 +73,12 @@
                     <div class="form-group">
                         {!! Form::label('id-label', 'ID:', ['class' => 'col-lg-2 control-label']) !!}
                         <div class="col-lg-4">
-                            {!! Form::text('id', $value = null, ['class' => 'form-control', 'disabled']) !!}
+                            {!! Form::text('id', $value = null, ['class' => 'form-control id', 'disabled']) !!}
                         </div>
+                        <input type="hidden" class="hidden-id" name="id" value="">
                         {!! Form::label('date-label', 'Date:', ['class' => 'col-lg-2 control-label']) !!}
                         <div class="col-lg-4">
-                            {!! Form::text('date', $value = date('m/d/Y'), ['class' => 'form-control', 'disabled']) !!}
+                            {!! Form::text('date', $value = date('m/d/Y'), ['class' => 'form-control date', 'disabled']) !!}
                         </div>
                     </div>
 

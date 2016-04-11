@@ -70,7 +70,17 @@ var listTicketTable = {};
     };
     table.events = {
         'click .edit': function (e, value, row, index) {
-            alert('You click edit action, row: ' + JSON.stringify(row));
+            $('#myModal').modal('show');
+            $('.modal-title').html("View Ticket");
+            $('.form-control.id').val(row.id);
+            $('.hidden-id').val(row.id);
+            var t = row.created_at.split(/[- :]/);
+            var new_date = t[1] + "/" + t[2] + "/" + t[0];
+            $('.form-control.date').val(new_date);
+            $('.subject').val(row.subject);
+            $('.description').val(row.description);
+            $('.importance').val(row.importance);
+            $('.status').val(row.status);
         },
         'click .remove': function (e, value, row, index) {
             $table.bootstrapTable('remove', {

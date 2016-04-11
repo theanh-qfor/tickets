@@ -33,6 +33,10 @@ $(function() {
     uploader.init();
 
     $('button[data-dismiss="modal"]').click(function(){
+        $('.modal-title').html("Add Ticket");
+        $('.form-control.id').val("");
+        $('.hidden-id').val("");
+        $('.form-control.date').val(getTodayDate());
         $('.subject').val("");
         $('.description').val("");
         $('.importance').val("low");
@@ -40,4 +44,21 @@ $(function() {
         $('#filelist').empty();
         $('.file-array').empty();
     });
+    function getTodayDate(){
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+        var yyyy = today.getFullYear();
+
+        if(dd<10) {
+            dd='0'+dd
+        }
+
+        if(mm<10) {
+            mm='0'+mm
+        }
+
+        today = mm+'/'+dd+'/'+yyyy;
+        return today;
+    }
 });
