@@ -23,6 +23,7 @@ $(function() {
             FileUploaded: function(up, file, object) {
                 if (object.response){
                     var json_object = JSON.parse(object.response);
+                    console.log(json_object);
                     $('.file-array').append('<input type="hidden" name="qty[]" value="' + json_object.id + '" />');
                 }
             }
@@ -31,29 +32,33 @@ $(function() {
 
     uploader.init();
 
-//    $("#filelist").pluploadQueue({
-//        // General settings
-//        runtimes : 'html5',
-//        url : 'upload.php',
-//        max_file_size : '10mb',
-//        chunk_size : '1mb',
-//        unique_names : true,
-//        dragdrop : true,
-//        multiple_queues : false,
-//        multi_selection : false,
-//        max_file_count : 100,
-//
-//
-//        init : {
-//            FilesAdded: function(up, files) {
-//                document.getElementById('filelist').innerHTML += '<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></div>';
-//                up.start();
-//            },
-//            UploadComplete: function(up, files) {
-//                $.each(files, function(i, file) {
-//                    // Do stuff with the file. There will only be one file as it uploaded straight after adding!
-//                });
-//            }
-//        }
-//    });
+    $('button[data-dismiss="modal"]').click(function(){
+        $('.modal-title').html("Add Ticket");
+        $('.form-control.id').val("");
+        $('.hidden-id').val("");
+        $('.form-control.date').val(getTodayDate());
+        $('.subject').val("");
+        $('.description').val("");
+        $('.importance').val("low");
+        $('.status').val("new");
+        $('#filelist').empty();
+        $('.file-array').empty();
+    });
+    function getTodayDate(){
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+        var yyyy = today.getFullYear();
+
+        if(dd<10) {
+            dd='0'+dd
+        }
+
+        if(mm<10) {
+            mm='0'+mm
+        }
+
+        today = mm+'/'+dd+'/'+yyyy;
+        return today;
+    }
 });

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Input, Redirect;
 
 
 class TicketsController extends Controller
@@ -102,8 +103,13 @@ class TicketsController extends Controller
     }
     public function addTicket()
     {
-        $ticket = new TicketModel();
-
+        $id = Input::get('id');
+        if (empty($id)){
+            $ticket = new TicketModel();
+        }
+        else{
+            $ticket = TicketModel::find($id);
+        }
         $ticket->subject = Input::get('subject');
         $ticket->description = Input::get('description');
         $ticket->importance = Input::get('importance');
@@ -111,11 +117,14 @@ class TicketsController extends Controller
         $ticket->save();
 
         $file_ids = Input::get("qty");
-        foreach ($file_ids as $key => $value) {
-            $file_object = TicketFilesModel::find($value);
-            $file_object->ticket_id = $ticket->id;
-            $file_object->save();
+        if (!empty($file_ids)){
+            foreach ($file_ids as $key => $value) {
+                $file_object = TicketFilesModel::find($value);
+                $file_object->ticket_id = $ticket->id;
+                $file_object->save();
+            }
         }
+
         return Redirect::back();
 
     }

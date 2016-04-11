@@ -68,42 +68,43 @@
             <div class="modal-content">
                 {!! Form::open(['url' => '/add_tickets', 'class' => 'form-horizontal']) !!}
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <button type="button" id="close" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Add Ticket</h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
                         {!! Form::label('id-label', 'ID:', ['class' => 'col-lg-2 control-label']) !!}
                         <div class="col-lg-4">
-                            {!! Form::text('id', $value = null, ['class' => 'form-control', 'disabled']) !!}
+                            {!! Form::text('id', $value = null, ['class' => 'form-control id', 'disabled']) !!}
                         </div>
+                        <input type="hidden" class="hidden-id" name="id" value="">
                         {!! Form::label('date-label', 'Date:', ['class' => 'col-lg-2 control-label']) !!}
                         <div class="col-lg-4">
-                            {!! Form::text('date', $value = date('m/d/Y'), ['class' => 'form-control', 'disabled']) !!}
+                            {!! Form::text('date', $value = date('m/d/Y'), ['class' => 'form-control date', 'disabled']) !!}
                         </div>
                     </div>
 
                     <div class="form-group">
-                        {!! Form::label('subject-label', 'Subject:', ['class' => 'col-lg-2 control-label']) !!}
+                        {!! Form::label('subject-label', 'Subject:', ['class' => 'col-lg-2 control-label can-be-cleared']) !!}
                         <div class="col-lg-10">
-                            {!! Form::text('subject', $value = null, ['class' => 'form-control', 'placeholder' => 'Subject']) !!}
+                            {!! Form::text('subject', $value = null, ['class' => 'form-control subject', 'placeholder' => 'Subject']) !!}
                         </div>
                     </div>
 
                     <div class="form-group">
                         {!! Form::label('description-label', 'Description', ['class' => 'col-lg-2 control-label']) !!}
                         <div class="col-lg-10">
-                            {!! Form::textarea('description', $value = null, ['class' => 'form-control', 'rows' => 4]) !!}
+                            {!! Form::textarea('description', $value = null, ['class' => 'form-control description', 'rows' => 4]) !!}
                         </div>
                     </div>
                     <div class="form-group">
                         {!! Form::label('importance-label', 'Importance:', ['class' => 'col-lg-2 control-label']) !!}
                         <div class="col-lg-4">
-                            {!! Form::select('importance', array('low' => 'Low', 'normal' => 'Normal', 'high' => 'High', 'urgent' => 'Urgent')) !!}
+                            {!! Form::select('importance', array('low' => 'Low', 'normal' => 'Normal', 'high' => 'High', 'urgent' => 'Urgent'), null, array('class' => 'form-control importance')) !!}
                         </div>
                         {!! Form::label('status-label', 'Status:', ['class' => 'col-lg-2 control-label']) !!}
                         <div class="col-lg-4">
-                            {!! Form::select('status', array('new' => 'New', 'under review' => 'Under review', 'assigned' => 'Assigned', 'question' => 'Question', 'answer' => 'Answer', 'resolved' => 'Resolved', 'cancelled' => 'Cancelled', 'closed' => 'Closed')) !!}
+                            {!! Form::select('status', array('new' => 'New', 'under review' => 'Under review', 'assigned' => 'Assigned', 'question' => 'Question', 'answer' => 'Answer', 'resolved' => 'Resolved', 'cancelled' => 'Cancelled', 'closed' => 'Closed'), null, array('class' => 'form-control status')) !!}
                         </div>
                     </div>
                     <div class="form-group">
@@ -117,7 +118,7 @@
                 </div>
                 <div class="modal-footer">
                     {!! Form::submit('Save', ['class' => 'btn btn-default'] ) !!}
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" id="close" data-dismiss="modal">Close</button>
                 </div>
                 {!! Form::close()  !!}
             </div>
