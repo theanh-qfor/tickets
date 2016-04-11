@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests;
 use App\Models\TicketModel;
 use App\Models\TicketFilesModel;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Input, Redirect;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 
 class TicketsController extends Controller
 {
@@ -22,14 +25,68 @@ class TicketsController extends Controller
     }
 
     public function getTickets(Request $request){
-        $all=TicketModel::all();
-        $total=TicketModel::count();
+        $limit=$request->query('limit',10);
+        $offset=$request->query('offset',0);
+        $search=$request->query('search');
+        $sort=$request->query('sort');
+        $order=$request->query('order');
+        if(!$sort){
+            $sort='id';
+            $order='desc';
+        }
+        $tickets=TicketModel::orderBy($sort,$order);
+        if(Auth::user()->role!='engineer') {
+            $tickets = $tickets->where('user_id', Auth::user()->id);
+        }else{
+
+        }
+        if($status=$request->query('status')){
+            $tickets->where('status',$status);
+        }
+
+        if($importance=$request->query('importance')){
+            $tickets->where('importance',$importance);
+        }
+        if($search) {
+            $tickets->orwhere('subject','LIKE','%'.$search.'%');
+            $tickets->orwhere('description','LIKE','%'.$search.'%');
+            $tickets->orwhere('status','LIKE',$search.'%');
+            $tickets->orwhere('importance','LIKE',$search.'%');
+            $tickets->orwhere('created_at','LIKE','%'.$search.'%');
+        }
+        $total=$tickets->count();
+        $items=$tickets->skip($offset)->take($limit)->get();
+        foreach ($items as $i){
+            $i->assigned_name=$i->user_name='';
+            if($i->user_id) {
+                $user=User::find($i->user_id);
+                $i->user_name=$user->exists()?$user->name:'';
+            }
+            if($i->assigned_to){
+                $user=User::find($i->assigned_to);
+                $i->assigned_name=$user->exists()?$user->name:'';
+            }
+        }
         $results=[
             'total'=>$total,
-            'rows'=>$all,
+            'rows'=>$items,
         ];
         //$this->createSampleTickets();
         return response()->json($results);
+    }
+    function deleteTickets(Request $request){
+        $tickets=$request->query('tickets',array());
+        if(Auth::user()->role=='engineer'){
+            TicketModel::destroy($tickets);
+        }else {
+            foreach ((array)$tickets as $ticket_id) {
+                $ticket = TicketModel::find($ticket_id);
+                if ($ticket->user_id == Auth::user()->id) {
+                    $ticket->delete();
+                }
+            }
+        }
+
     }
     function createSampleTickets($user_id=1,$num=100){
         for($i=0;$i<$num;$i++) {
@@ -37,7 +94,7 @@ class TicketsController extends Controller
                 'subject' => 'Ticket  ' . rand(),
                 'description' => 'Ticket description ' . rand(),
                 'status' => TicketModel::$allStatus[array_rand(TicketModel::$allStatus)],
-                'importance' => TicketModel::$allStatus[array_rand(TicketModel::$allImportances)],
+                'importance' => TicketModel::$allImportances[array_rand(TicketModel::$allImportances)],
                 'assigned_to' => 0,
             );
             (new TicketModel($data))->save();
