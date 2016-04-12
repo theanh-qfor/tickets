@@ -5,7 +5,9 @@ var listTicketTable = {};
         table.vars = {
             filters: {},
             selections: [],
-            token:$('meta[name="csrf-token"]').attr('content'),
+            token: $('meta[name="csrf-token"]').attr('content'),
+            is_engineer: $table.data('is-engineer'),
+            ajaxUrl:$table.data('ajax-url')
         };
     };
     table.initVars();
@@ -21,6 +23,88 @@ var listTicketTable = {};
         }
     };
     table.init = function () {
+        var columns = [
+
+            {
+                field: 'state',
+                checkbox: true,
+                align: 'center',
+                valign: 'middle'
+            }, {
+                title: 'Subject',
+                field: 'subject',
+                width: '50%',
+                valign: "middle",
+                sortable: true
+            },
+            {
+                title: 'Status',
+                field: 'status',
+                align: "center",
+                valign: "middle",
+                formatter: function (value) {
+                    var statusValue = value.replace(/[^a-z0-9]/g, '');
+                    statusValue = 'status' + '-' + statusValue;
+                    return '<span class="' + statusValue + '">' + value + '</span>';
+                },
+                sortable: true
+            },
+            {
+                title: 'Importance',
+                field: 'importance',
+                align: "center",
+                valign: "middle",
+                sortable: true
+            }
+
+        ];
+        if (table.vars.is_engineer) {
+            columns = columns.concat([{
+                title: 'User',
+                field: 'user_name',
+                formatter: function (value) {
+                    return value;
+                },
+                align: "center",
+                valign: "middle",
+                sortable: true
+            },
+                {
+                    title: 'Assigned',
+                    field: 'assigned_name',
+                    formatter: function (value,object,col,html) {
+                        if (!value) {
+                            value = "&ndash;";
+                        }
+                        value = '<a class="inline-edit" data-id="'+object.id+'">' + value + '</a>';
+                        return value;
+                    },
+                    align: "center",
+                    valign: "middle",
+                    class: 'col-assigned',
+                    events: {
+                    },
+                    sortable: true
+                }
+            ]);
+        }
+        columns = columns.concat([
+            {
+                title: 'Date',
+                field: 'created_at',
+                formatter: function (value) {
+                    var t = value.split(/[- :]/);
+                    var date = new Date(t[0], t[1] - 1, t[2], t[3], t[4], t[5]);
+                    return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+                },
+                sortable: true
+            },
+            {
+                title: 'Action',
+                formatter: table.renderActions,
+                events: table.events
+            }
+        ]);
         $table.bootstrapTable({
             queryParams: table.queryParams,
             responseHandler: function (res) {
@@ -29,56 +113,83 @@ var listTicketTable = {};
                 });
                 return res;
             },
-            columns: [
+            columns: columns
 
-                {
-                    field: 'state',
-                    checkbox: true,
-                    align: 'center',
-                    valign: 'middle'
-                }, {
-                    title: 'Subject',
-                    field: 'subject',
-                    width: '50%',
-                    sortable: true
-                },
-                {
-                    title: 'Status',
-                    field: 'status',
-                    formatter: function (value) {
-                        var statusValue = value.replace(/[^a-z0-9]/g, '');
-                        statusValue = 'status' + '-' + statusValue;
-                        return '<span class="' + statusValue + '">' + value + '</span>';
-                    },
-                    sortable: true
-                },
-                {
-                    title: 'Importance',
-                    field: 'importance',
-                    sortable: true
-                },
-                {
-                    title: 'Date',
-                    field: 'created_at',
-                    formatter:function (value){
-                        var t = value.split(/[- :]/);
-                        var date = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
-                        return (date.getMonth()+1)+'/'+date.getDate()+'/'+date.getFullYear();
-                    },
-                    sortable: true
-                },
-                {
-                    title: 'Action',
-                    formatter: table.renderActions,
-                    events: table.events
-                }
 
-            ]
-        })
-        ;
-
+        });
+        $table.on('click','.inline-edit',table.makeEditable);
+        $('body').on('click','*',function(e){
+            var clicked=$(e.currentTarget);
+            if(clicked.is('.inline-edit')||clicked.closest('.select2-container--open').length>0) return true;
+            if(clicked.closest('.assign-select-wrapper').length<=0){
+                $('.assign-select-wrapper').each(function(){
+                    var select=$(this).find('select');
+                    select.select2('destroy');
+                    $('.select2-container--open').remove();
+                    var cell=select.closest('td');
+                    cell.html(cell.data('html'));
+                    $(this).remove();
+                });
+            }
+        });
 
     };
+    table.makeEditable=function(element){
+        var cell=$(this).closest('td');
+        if(!cell.data('ticket')) {
+            cell.data('ticket',$(this).data('id'));
+        }
+        cell.data('html', cell.html());
+        var ticket_id=cell.data('ticket');
+        var id=cell.closest('tr').find();
+        var select=$('<select>');
+        var wrapped=$('<div class="assign-select-wrapper"></div>').on('click',function(e){
+            e.stopPropagation();
+        }).css({position:'absolute',left:-40,top:10}).html(select);
+
+        cell.html(wrapped);
+        select.select2({
+            width:"160",
+            style:{position:"absolute"},
+            ajax: {
+                url: table.vars.ajaxUrl+'/suggest/user',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page,
+                    };
+                },
+                processResults: function (data, page) {
+                    // parse the results into the format expected by Select2.
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data
+                    return {
+                        results: data
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1
+
+        });
+        select.on('select2:select',function(e){
+            table.ajax({
+               type:"POST",
+                url:table.vars.ajaxUrl+'/tickets/assign',
+                data:{
+                    user:e.params.data.id,
+                    ticket:ticket_id
+                }
+            }).done(function(){
+                cell.html('<a class="inline-edit">'+e.params.data.text+'</a>');
+                wrapped.remove();
+            });
+
+        });
+    };
+
     table.queryParams = function (params) {
         if (table.vars.filters) {
             return $.extend({}, params, table.vars.filters);
@@ -100,7 +211,7 @@ var listTicketTable = {};
             $('.status').val(row.status);
         },
         'click .remove': function (e, value, row, index) {
-            table.delete([row.id]).done(function(){
+            table.delete([row.id]).done(function () {
                 table.refresh();
             });
         }
@@ -135,7 +246,9 @@ var listTicketTable = {};
                 return false;
             }
             //console.log(table.getOptions());
-            table.delete(ids).done(function(){table.refresh()});
+            table.delete(ids).done(function () {
+                table.refresh()
+            });
             $remove.prop('disabled', true);
         });
         var $status_filter = $('#status-filter');
@@ -165,8 +278,8 @@ var listTicketTable = {};
         }, options);
         return $.ajax(options);
     };
-    table.delete = function(ids){
-        return table.ajax({type: "DELETE", url:table.getOptions()['url']+'?' + $.param({'tickets': ids})});
+    table.delete = function (ids) {
+        return table.ajax({type: "DELETE", url: table.getOptions()['url'] + '?' + $.param({'tickets': ids})});
     };
     function getIdSelections() {
         return $.map($table.bootstrapTable('getSelections'), function (row) {
