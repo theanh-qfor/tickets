@@ -15,7 +15,7 @@ $(function() {
 
             FilesAdded: function(up, files) {
                 plupload.each(files, function(file) {
-                    document.getElementById('filelist').innerHTML += '<div id="' + file.id + '">' + file.name + ' (' + plupload.formatSize(file.size) + ') <b></b></div>';
+                    document.getElementById('filelist').innerHTML += '<div id="' + file.id + '">' + file.name + '</div>';
                     up.start();
                 });
             },
@@ -44,6 +44,39 @@ $(function() {
         $('#filelist').empty();
         $('.file-array').empty();
     });
+
+    $('#comment-post').click(function(){
+        var comment_content = $('.comment-container .comment').val();
+        if (comment_content == ''){
+            alert('Enter your message !');
+            return;
+        }
+        var data = {
+            comment : comment_content
+        }
+        $.ajax({
+
+            type: "POST",
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url : $(this).data("href"),
+            data: data,
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                $('.more-comments').prepend("<p>" + comment_content + "</p>");
+                $('.comment-array').append('<input type="hidden" name="comments[]" value="' + data.id + '" />');
+                $('.comment-container .comment').val("");
+
+            },
+            error: function (data) {
+                console.log('Error:', data);
+            }
+        });
+    });
+
+
     function getTodayDate(){
         var today = new Date();
         var dd = today.getDate();

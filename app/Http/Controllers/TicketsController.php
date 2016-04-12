@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests;
 use App\Models\TicketModel;
 use App\Models\TicketFilesModel;
+use App\Models\TicketCommentsModel;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -114,6 +115,7 @@ class TicketsController extends Controller
         $ticket->description = Input::get('description');
         $ticket->importance = Input::get('importance');
         $ticket->status = Input::get('status');
+        $ticket->user_id = Auth::user()->id;
         $ticket->save();
 
         $file_ids = Input::get("qty");
@@ -122,6 +124,14 @@ class TicketsController extends Controller
                 $file_object = TicketFilesModel::find($value);
                 $file_object->ticket_id = $ticket->id;
                 $file_object->save();
+            }
+        }
+        $comment_ids = Input::get("comments");
+        if (!empty($comment_ids)){
+            foreach ($comment_ids as $key => $value) {
+                $comment_object = TicketCommentsModel::find($value);
+                $comment_object->ticket_id = $ticket->id;
+                $comment_object->save();
             }
         }
 
@@ -134,7 +144,7 @@ class TicketsController extends Controller
 
         if($file) {
             $destinationPath = public_path().'/uploads/';
-            $filename = $file->getClientOriginalName().'.'.$file->getClientOriginalExtension();
+            $filename = $file->getClientOriginalName();
 
             $upload_success = $file->move($destinationPath, $filename);
             $ticket_files = new TicketFilesModel();
@@ -145,6 +155,53 @@ class TicketsController extends Controller
         return response()->json(array(
             'success' => true,
             'id'   => $ticket_files->id
+        ));
+    }
+    public function post_comment(){
+        $comment = Input::get('comment');
+        $user_id = Auth::user()->id;
+        $ticket_comment = new TicketCommentsModel();
+        $ticket_comment->comment = $comment;
+        $ticket_comment->user_id = $user_id;
+        $ticket_comment->save();
+        return response()->json(array(
+            'success' => true,
+            'id'   => $ticket_comment->id
+        ));
+    }
+    public function get_file_and_comment(){
+        $id = Input::get('id');
+        $ticket_file_count = TicketFilesModel::where("ticket_id", $id)->count();
+        $comment_count = TicketCommentsModel::where("ticket_id", $id)->count();
+        $files = array();
+        $comments = array();
+        if ($ticket_file_count > 0){
+            $ticket_file_list = TicketFilesModel::where("ticket_id", $id)->get();
+            foreach($ticket_file_list as $file){
+                $file_item = array(
+                    'id'        => $file->id,
+                    'file_name' => $file->file_name,
+                    'file_path' => $file->file_path
+                );
+                $files[] = $file_item;
+            }
+        }
+        if ($comment_count > 0){
+            $comment_list = TicketCommentsModel::where("ticket_id", $id)->orderBy('created_at', 'desc')->get();
+            foreach($comment_list as $comment){
+                $user = User::find($comment->user_id);
+                $comment_item = array(
+                    'id'            => $comment->id,
+                    'comment'       => $comment->comment,
+                    'created_at'    => $comment->created_at,
+                    'username'      => $user->name
+                );
+                $comments[] = $comment_item;
+            }
+        }
+        return response()->json(array(
+            'files'     => $files,
+            'comments'  => $comments
         ));
     }
 }

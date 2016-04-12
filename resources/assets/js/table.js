@@ -87,6 +87,7 @@ var listTicketTable = {};
     };
     table.events = {
         'click .edit': function (e, value, row, index) {
+            console.log(JSON.stringify(row));
             $('#myModal').modal('show');
             $('.modal-title').html("View Ticket");
             $('.form-control.id').val(row.id);
@@ -98,6 +99,29 @@ var listTicketTable = {};
             $('.description').val(row.description);
             $('.importance').val(row.importance);
             $('.status').val(row.status);
+
+            //get ticket file list and comment list via ajax
+            $.ajax({
+
+                type: "POST",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url : window.location.href + "get_files_and_comments",
+                data: {id: row.id},
+                dataType: 'json',
+                success: function (data) {
+                    for (i = 0; i < data.files.length; i++) {
+                        document.getElementById('filelist').innerHTML += '<div id="' + data.files[i].id + '">' + data.files[i].file_name + '</div>';
+                    }
+                    for (i = 0; i < data.comments.length; i++) {
+                        $('.more-comments').prepend("<p>" + data.comments[i].comment + "</p>");
+                    }
+                },
+                error: function (data) {
+                    console.log('Error:', data);
+                }
+            });
         },
         'click .remove': function (e, value, row, index) {
             table.delete([row.id]).done(function(){
