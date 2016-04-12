@@ -24,9 +24,11 @@ Route::auth();
 
 Route::get('tickets','TicketsController@getTickets');
 Route::delete('tickets','TicketsController@deleteTickets');
+Route::post('tickets/assign','TicketsController@assignTicket');
 Route::get('/index', function(){
     return view("index");
 });
+Route::get('suggest/user','SuggestController@userSuggest');
 Route::post('/add_tickets', 'TicketsController@addTicket');
 Route::post('/upload', 'TicketsController@upload');
 Route::post('/post_comment', 'TicketsController@post_comment');

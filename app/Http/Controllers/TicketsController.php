@@ -36,10 +36,27 @@ class TicketsController extends Controller
             $sort='id';
             $order='desc';
         }
-        $tickets=TicketModel::orderBy($sort,$order);
+        $model=new TicketModel();
+        $tickets=$model->newQuery();
+
+        $user_ids=array();
         if(Auth::user()->role!='engineer') {
+            $tickets->select(['id','subject','description','status','importance','created_at']);
             $tickets = $tickets->where('user_id', Auth::user()->id);
-        }else{
+        }else{//if engineer
+            $tickets->select('tickets.*','u.name as user_name','u.email as user_email','a.name as assigned_name','a.email as assigned_email');
+            $tickets->join('users as u','u.id','=','tickets.user_id');
+            $tickets->leftjoin('users as a','a.id','=','tickets.assigned_to');
+            if($search){
+                if(strpos($search,'@')===false) {
+                    $users=User::where('name', 'like', '%' . $search . '%');
+                }else{
+                    $users=User::where('email','like','%'.$search.'%');
+                }
+                $user_ids=$users->select('id')->get();
+                $user_ids=array_map(function($u){return $u->id;},$user_ids->all());
+
+            }
 
         }
         if($status=$request->query('status')){
@@ -50,24 +67,25 @@ class TicketsController extends Controller
             $tickets->where('importance',$importance);
         }
         if($search) {
-            $tickets->orwhere('subject','LIKE','%'.$search.'%');
-            $tickets->orwhere('description','LIKE','%'.$search.'%');
-            $tickets->orwhere('status','LIKE',$search.'%');
-            $tickets->orwhere('importance','LIKE',$search.'%');
-            $tickets->orwhere('created_at','LIKE','%'.$search.'%');
+            $tickets->where(function($q) use ($search,$user_ids){
+                $q->orwhere('tickets.subject','LIKE','%'.$search.'%');
+                $q->orwhere('tickets.description','LIKE','%'.$search.'%');
+                $q->orwhere('tickets.status','LIKE',$search.'%');
+                $q->orwhere('tickets.importance','LIKE',$search.'%');
+                $q->orwhere('tickets.created_at','LIKE','%'.$search.'%');
+                if($user_ids){
+                    $q->orwherein('user_id',$user_ids);
+                    $q->orwherein('assigned_to',$user_ids);
+                }
+            });
+
         }
         $total=$tickets->count();
+        $tickets=$tickets->orderBy($sort,$order);
         $items=$tickets->skip($offset)->take($limit)->get();
+
         foreach ($items as $i){
-            $i->assigned_name=$i->user_name='';
-            if($i->user_id) {
-                $user=User::find($i->user_id);
-                $i->user_name=$user->exists()?$user->name:'';
-            }
-            if($i->assigned_to){
-                $user=User::find($i->assigned_to);
-                $i->assigned_name=$user->exists()?$user->name:'';
-            }
+
         }
         $results=[
             'total'=>$total,
@@ -89,6 +107,21 @@ class TicketsController extends Controller
             }
         }
 
+    }
+    function assignTicket(){
+        if(Auth::user()->role!='engineer'){
+            response()->json(['success'=>0]);
+        }
+        $ticket_id=request('ticket');
+        $user_id=request('user');
+        $user=User::find($user_id);
+        $ticket=TicketModel::find($ticket_id);
+        if($user&&$ticket&&$user->role=='engineer') {
+            $ticket->assigned_to = $user->id;
+            $ticket->save();
+            response()->json(['success'=>1]);
+        }
+        response()->json(['success'=>0]);
     }
     function createSampleTickets($user_id=1,$num=100){
         for($i=0;$i<$num;$i++) {

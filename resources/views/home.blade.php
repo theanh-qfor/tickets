@@ -1,9 +1,12 @@
 @extends('layouts.one-column')
 @push('scripts')
 <script src="{{url('/build/dist/bootstrap-table.min.js')}}"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/js/select2.min.js"></script>
+
 @endpush
 @push('styles')
 <link rel="stylesheet" href="{{url('/build/dist/bootstrap-table.min.css')}}"/>
+<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/css/select2.min.css" rel="stylesheet" />
 @endpush
 @section('title')
     Tickets
@@ -23,7 +26,10 @@
                                data-side-pagination="server"
                                data-pagination="true"
                                data-page-list="[5, 10, 20, 50, 100, 200]"
-                               data-search="true">
+                               data-search="true"
+                               data-is-engineer="{{Auth::user()->role=='engineer'}}"
+                               data-ajax-url="{{url('/')}}"
+                        >
 
                         </table>
                         <div type="text/template" class="container-fluid" id="toolbar">
