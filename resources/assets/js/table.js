@@ -198,7 +198,6 @@ var listTicketTable = {};
     };
     table.events = {
         'click .edit': function (e, value, row, index) {
-            console.log(JSON.stringify(row));
             $('#myModal').modal('show');
             $('.modal-title').html("View Ticket");
             $('.form-control.id').val(row.id);
@@ -210,6 +209,13 @@ var listTicketTable = {};
             $('.description').val(row.description);
             $('.importance').val(row.importance);
             $('.status').val(row.status);
+            if ($('#list-tickets-table').data("is-engineer") == "1"){
+                $('.subject').prop("disabled", true);
+                $('.description').prop("disabled", true);
+                $('.importance').prop("disabled", true);
+                $('.status').prop("disabled", true);
+                $('input[type="submit"]').hide();
+            }
 
             //get ticket file list and comment list via ajax
             $.ajax({
@@ -223,10 +229,16 @@ var listTicketTable = {};
                 dataType: 'json',
                 success: function (data) {
                     for (i = 0; i < data.files.length; i++) {
-                        document.getElementById('filelist').innerHTML += '<div id="' + data.files[i].id + '">' + data.files[i].file_name + '</div>';
+                        document.getElementById('filelist').innerHTML += '<a id="' + data.files[i].id + '" href="'+ data.files[i].file_path + data.files[i].file_name + '">' + data.files[i].file_name + '</a></br>';
                     }
                     for (i = 0; i < data.comments.length; i++) {
-                        $('.more-comments').prepend("<p>" + data.comments[i].comment + "</p>");
+                        $('.more-comments').prepend("" +
+                            "<div class='comment-form'>" +
+                            "<div class='comment-author col-lg-2'>" +data.comments[i].username + "</div>" +
+                            "<div class='comment-content col-lg-10'>" +
+                            "<span class='comment-time'>" +data.comments[i].created_at + "</span>"+
+                            data.comments[i].comment +
+                            "</div></div>");
                     }
                 },
                 error: function (data) {

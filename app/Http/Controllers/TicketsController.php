@@ -174,20 +174,26 @@ class TicketsController extends Controller
     public function upload()
     {
         $file = Input::file('file');
-
+        $ticket_id = Input::get('ticket_id');
         if($file) {
-            $destinationPath = public_path().'/uploads/';
+            $token = uniqid();
+            $destinationPath = public_path().'/uploads/'.$token.'/';
             $filename = $file->getClientOriginalName();
 
             $upload_success = $file->move($destinationPath, $filename);
             $ticket_files = new TicketFilesModel();
-            $ticket_files->file_path = $destinationPath;
+            $ticket_files->file_path = '/uploads/'.$token.'/';
             $ticket_files->file_name = $filename;
+            if($ticket_id){
+                $ticket_files->ticket_id = $ticket_id;
+            }
             $ticket_files->save();
         };
         return response()->json(array(
             'success' => true,
-            'id'   => $ticket_files->id
+            'id'   => $ticket_files->id,
+            'file_path'=> $ticket_files->file_path,
+            'file_name'=> $ticket_files->file_name
         ));
     }
     public function post_comment(){
@@ -196,10 +202,16 @@ class TicketsController extends Controller
         $ticket_comment = new TicketCommentsModel();
         $ticket_comment->comment = $comment;
         $ticket_comment->user_id = $user_id;
+        if(Input::get("ticket_id")){
+            $ticket_comment->ticket_id = Input::get("ticket_id");
+        }
         $ticket_comment->save();
         return response()->json(array(
-            'success' => true,
-            'id'   => $ticket_comment->id
+            'comment' => $comment,
+            'id'   => $ticket_comment->id,
+            'created_at' => $ticket_comment->created_at->format('m/d/Y'),
+            'username'  => Auth::user()->name,
+
         ));
     }
     public function get_file_and_comment(){
@@ -220,13 +232,13 @@ class TicketsController extends Controller
             }
         }
         if ($comment_count > 0){
-            $comment_list = TicketCommentsModel::where("ticket_id", $id)->orderBy('created_at', 'desc')->get();
+            $comment_list = TicketCommentsModel::where("ticket_id", $id)->orderBy('created_at', 'asc')->get();
             foreach($comment_list as $comment){
                 $user = User::find($comment->user_id);
                 $comment_item = array(
                     'id'            => $comment->id,
                     'comment'       => $comment->comment,
-                    'created_at'    => $comment->created_at,
+                    'created_at'    => $comment->created_at->format('m/d/Y'),
                     'username'      => $user->name
                 );
                 $comments[] = $comment_item;

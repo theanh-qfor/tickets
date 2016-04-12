@@ -8,6 +8,7 @@ $(function() {
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
+        multipart_params: {},
         init: {
             PostInit: function() {
                 document.getElementById('filelist').innerHTML = '';
@@ -15,7 +16,8 @@ $(function() {
 
             FilesAdded: function(up, files) {
                 plupload.each(files, function(file) {
-                    document.getElementById('filelist').innerHTML += '<div id="' + file.id + '">' + file.name + '</div>';
+                    var ticket_id = $('.hidden-id').val();
+                    up.settings.multipart_params["ticket_id"] = ticket_id;
                     up.start();
                 });
             },
@@ -24,6 +26,7 @@ $(function() {
                 if (object.response){
                     var json_object = JSON.parse(object.response);
                     console.log(json_object);
+                    document.getElementById('filelist').innerHTML += '<a id="' + json_object.id + '" href="'+ json_object.file_path + json_object.file_name + '">' + json_object.file_name + '</a></br>';
                     $('.file-array').append('<input type="hidden" name="qty[]" value="' + json_object.id + '" />');
                 }
             }
@@ -43,6 +46,13 @@ $(function() {
         $('.status').val("new");
         $('#filelist').empty();
         $('.file-array').empty();
+        $('.more-comments').empty();
+        $('.comment-array').empty();
+        $('.subject').prop("disabled", false);
+        $('.description').prop("disabled", false);
+        $('.importance').prop("disabled", false);
+        $('.status').prop("disabled", false);
+        $('input[type="submit"]').show();
     });
 
     $('#comment-post').click(function(){
@@ -54,6 +64,9 @@ $(function() {
         var data = {
             comment : comment_content
         }
+        if ($('.hidden-id').val() != ""){
+            data.ticket_id = $('.hidden-id').val();
+        }
         $.ajax({
 
             type: "POST",
@@ -64,8 +77,13 @@ $(function() {
             data: data,
             dataType: 'json',
             success: function (data) {
-                console.log(data);
-                $('.more-comments').prepend("<p>" + comment_content + "</p>");
+                $('.more-comments').prepend("" +
+                    "<div class='comment-form'>" +
+                    "<div class='comment-author col-lg-2'>" +data.username + "</div>" +
+                    "<div class='comment-content col-lg-10'>" +
+                    "<span class='comment-time'>" +data.created_at + "</span>"+
+                    data.comment +
+                    "</div></div>");
                 $('.comment-array').append('<input type="hidden" name="comments[]" value="' + data.id + '" />');
                 $('.comment-container .comment').val("");
 
