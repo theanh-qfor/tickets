@@ -209,6 +209,42 @@ var listTicketTable = {};
             $('.description').val(row.description);
             $('.importance').val(row.importance);
             $('.status').val(row.status);
+            if ($('#list-tickets-table').data("is-engineer") == "1"){
+                $('.subject').prop("disabled", true);
+                $('.description').prop("disabled", true);
+                $('.importance').prop("disabled", true);
+                $('.status').prop("disabled", true);
+                $('input[type="submit"]').hide();
+            }
+
+            //get ticket file list and comment list via ajax
+            $.ajax({
+
+                type: "POST",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url : window.location.href + "get_files_and_comments",
+                data: {id: row.id},
+                dataType: 'json',
+                success: function (data) {
+                    for (i = 0; i < data.files.length; i++) {
+                        document.getElementById('filelist').innerHTML += '<a id="' + data.files[i].id + '" href="'+ data.files[i].file_path + data.files[i].file_name + '">' + data.files[i].file_name + '</a></br>';
+                    }
+                    for (i = 0; i < data.comments.length; i++) {
+                        $('.more-comments').prepend("" +
+                            "<div class='comment-form'>" +
+                            "<div class='comment-author col-lg-3'>" +data.comments[i].username + "</div>" +
+                            "<div class='comment-content col-lg-9'>" +
+                            "<span class='comment-time'>" +data.comments[i].created_at + "</span>"+
+                            data.comments[i].comment +
+                            "</div></div>");
+                    }
+                },
+                error: function (data) {
+                    console.log('Error:', data);
+                }
+            });
         },
         'click .remove': function (e, value, row, index) {
             table.delete([row.id]).done(function () {

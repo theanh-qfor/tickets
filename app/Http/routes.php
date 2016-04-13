@@ -31,3 +31,5 @@ Route::get('/index', function(){
 Route::get('suggest/user','SuggestController@userSuggest');
 Route::post('/add_tickets', 'TicketsController@addTicket');
 Route::post('/upload', 'TicketsController@upload');
+Route::post('/post_comment', 'TicketsController@post_comment');
+Route::post('/get_files_and_comments', 'TicketsController@get_file_and_comment');

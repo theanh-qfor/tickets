@@ -67,7 +67,7 @@
             </div>
         </div>
     </div>
-    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Add Ticket</button>
+    <button type="button" class="btn btn-info btn-lg{{{ (Auth::user()->role=='engineer') ? ' hide' : '' }}}" data-toggle="modal" data-target="#myModal" id="add-ticket">Add Ticket</button>
 
     <div id="myModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
@@ -121,6 +121,18 @@
                             <div class="file-array"></div>
                         </div>
                     </div>
+
+                    <div class="comment-container">
+                        <h4 class="comment-title">Comment</h4>
+                        <div class="comment-box col-lg-12">
+                            {!! Form::textarea('comments', $value = null, ['class' => 'form-control comment', 'placeholder' => 'Leave Comments Here...', 'rows' => 4]) !!}
+                            <button type="button" class="btn btn-default" id="comment-post" data-href="{{url('/post_comment')}}">Post</button>
+                        </div>
+                        <div class="more-comments">
+                        <div class="comment-array"></div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     {!! Form::submit('Save', ['class' => 'btn btn-default'] ) !!}
