@@ -67,7 +67,7 @@
             </div>
         </div>
     </div>
-    <button type="button" class="btn btn-info btn-lg{{{ (Auth::user()->role=='engineer') ? ' hide' : '' }}}" data-toggle="modal" data-target="#myModal">Add Ticket</button>
+    <button type="button" class="btn btn-info btn-lg{{{ (Auth::user()->role=='engineer') ? ' hide' : '' }}}" data-toggle="modal" data-target="#myModal" id="add-ticket">Add Ticket</button>
 
     <div id="myModal" class="modal fade" role="dialog">
         <div class="modal-dialog">

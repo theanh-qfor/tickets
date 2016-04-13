@@ -35,11 +35,12 @@ $(function() {
 
     uploader.init();
 
-    $('button[data-dismiss="modal"]').click(function(){
+    $('#myModal').on('hidden.bs.modal', function () {
         $('.modal-title').html("Add Ticket");
         $('.form-control.id').val("");
         $('.hidden-id').val("");
         $('.form-control.date').val(getTodayDate());
+        $('.form-control.comment').val("");
         $('.subject').val("");
         $('.description').val("");
         $('.importance').val("low");
@@ -79,8 +80,8 @@ $(function() {
             success: function (data) {
                 $('.more-comments').prepend("" +
                     "<div class='comment-form'>" +
-                    "<div class='comment-author col-lg-2'>" +data.username + "</div>" +
-                    "<div class='comment-content col-lg-10'>" +
+                    "<div class='comment-author col-lg-3'>" +data.username + "</div>" +
+                    "<div class='comment-content col-lg-9'>" +
                     "<span class='comment-time'>" +data.created_at + "</span>"+
                     data.comment +
                     "</div></div>");

@@ -234,8 +234,8 @@ var listTicketTable = {};
                     for (i = 0; i < data.comments.length; i++) {
                         $('.more-comments').prepend("" +
                             "<div class='comment-form'>" +
-                            "<div class='comment-author col-lg-2'>" +data.comments[i].username + "</div>" +
-                            "<div class='comment-content col-lg-10'>" +
+                            "<div class='comment-author col-lg-3'>" +data.comments[i].username + "</div>" +
+                            "<div class='comment-content col-lg-9'>" +
                             "<span class='comment-time'>" +data.comments[i].created_at + "</span>"+
                             data.comments[i].comment +
                             "</div></div>");
