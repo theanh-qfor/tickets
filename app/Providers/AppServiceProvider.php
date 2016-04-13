@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,8 +12,12 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(Request $request)
     {
+        $schema=$request->server->get('HTTP_X_FORWARDED_PROTO');
+        if($schema&&strtolower($schema)=='https'){
+            $request->server->set('HTTPS','on');
+        }
         //
     }
 
